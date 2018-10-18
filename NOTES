@@ -1,0 +1,95 @@
+
+
+/////////////////// INSTALL AND QUICKSTART ///////////////////
+
+
+// install Minikube with Homebrew
+brew cask install minikube
+
+// make sure Docker daemon is running
+docker images
+
+
+// start the Minikube cluster (specify docker for mac with --vm-driver flag)
+minikube start --vm-driver=hyperkit
+
+// point kubectl to interact with the 'minikube' cluster by modifying the config
+kubectl config use-context minikube
+
+// verify cluster configuration
+kubectl cluster-info
+
+
+// open browser dashboard
+minikube dashboard
+
+
+// create the node.js server
+// create the Dockerfile
+
+
+// point Docker to Minikube's Docker daemon
+eval $(minikube docker-env)
+
+// build the Docker image
+docker build -t hello-node:v1 .
+
+// verify the new Docker image is in Minikubes Docker registry
+// output should include REPOSITORY: node, hello-node
+minikube ssh docker images
+
+
+// create a Kube Deployment that manages a Pod
+kubectl create hello-node --image=hello-node:v1 --port=8080 \
+--image-pull-policy=Never
+
+// verify the Deployment
+// output should include: hello-node
+kubectl get deployments
+
+// view the cluster events
+kubectl get events
+
+// view the kubectl configuration
+kubectl view config
+
+
+// create a service (expose the Pod to the public internet)
+kubectl expose deployment hello-node --type=LoadBalancer
+
+// verify the service creation
+// output should include: hello-node
+kubectl get services
+
+// view in the browser by hitting the service
+minikube service hello-node
+
+// view the logs of a Pod
+kubectl logs <POD-NAME>
+
+
+// update the node.js server
+
+// build a new version of the image
+docker build -t hello-node:v2 .
+
+// update the Kubes Deployment image
+kubectl set image deployment/hello-node hello-node=hello-node:v2
+
+// hit the service again to verify changes
+minikube service hello-node
+
+
+// delete Kubes Service and Deployment
+kubectl delete service hello-node
+kubectl delete deployment hello-node
+
+// remove the created Docker images
+docker rmi hello-node:v1 hello-node:v2 -f
+
+// stop the Minikube virtual machine
+minikube stop
+
+// point Docker back to local daemon
+eval $(minikube docker-env -u)
+
