@@ -1,0 +1,133 @@
+
+
+//////// KUBES ARCHITECTURE OVERVIEW ////////
+
+
+Cluster - holds master and nodes
+Master - manages all activities in the cluster
+Node - workers machines (physical or virtual), holds one or more Pods,
+	communicates with Master via Kubes API
+Pod - group of one or more app containers, always run on a Node
+Deployment - run applications on a cluster via a config, once created, the
+	master schedules nodes to be spun-up running the app
+Service - defines an access policy, internally and externally, for a set of Pods
+
+
+//////// COMMON COMMANDS ////////
+
+// Minikube
+minikube version :: check version, know it's installed properly
+minikube start :: spin-up a minikube virtual machine
+
+// Kube CLI (kubectl)
+kubectl version :: check version, know the CLI is installed properly
+kubectl cluster-info :: show Master information and cluster location
+kubectl cluster-info dump :: debug cluster problems
+kubectl get nodes :: show info about nodes
+kubectl run <deploy-name> --image=<image-loc> --port=<port> :: schedule a deploy
+
+// get info about deployed applications and their environments
+kubectl get :: list resources
+kubectl describe :: show detailed information about a resource
+kubectl logs :: print the logs from a container in a pod
+kubectl exec :: execute a command on a container in a pod
+
+
+//////// PROXIES AND POD INTERACTION ////////
+
+kubectl proxy :: runs a server to communicate with the cluster via HTTP API
+
+// check that it's running
+curl http://localhost:8001/version
+
+// get Pod name and set env variable
+export POD_NAME=$(kubectl get pods -o go-template --template \
+'{{range .items}}{{.metadata.name}}{{"\n"}}{{end}}'); \
+echo Name of the Pod: $POD_NAME
+
+// hit the Pod API via the proxy
+curl http://localhost:8001/api/v1/namespaces/default/pods/$POD_NAME/proxy/
+
+// look at the logs of the Pod
+kubectl logs $POD_NAME
+
+// execute commmands in the Pod
+kubectl exec $POD_NAME env
+
+// enter a shell session in the Pod
+kubectl exec -ti $POD_NAME bash
+
+
+//////// SERVICES ////////
+
+// expose a Service
+kubectl expose deployment/kubernetes-bootcamp --type="NodePort" --port 8080
+
+// view Services
+kubectl get services
+
+// view info about a particular Service
+kubectl describe services/kubernetes-bootcamp
+
+// get Node port
+export NODE_PORT=$(kubectl get services/kubernetes-bootcamp -o \
+go-template='{{(index .spec.ports 0).nodePort}}'); \
+echo NODE_PORT=$NODE_PORT
+
+// hit the Service via HTTP
+curl $(minikube ip):$NODE_PORT
+
+// apply a label to a Pod
+kubectl label pod $POD_NAME app=v1
+
+
+//////// SCALING ////////
+
+// scale a deployment to a specified replica count
+kubectl scale deployments/kubernetes-bootcamp --replicas=4
+
+// verify scaling by viewing deployments status
+kubectl get deployments
+
+// view the individual scaled Pods
+kubectl get pods -o wide
+
+// get the exposed IP from the Service by viewing Service info
+kubectl describe services/kubernetes-bootcamp
+
+// get the Node port of the Service
+export NODE_PORT=$(kubectl get services/kubernetes-bootcamp -o \
+go-template='{{(index .spec.ports 0).nodePort}}'); \
+echo NODE_PORT=$NODE_PORT
+
+// test that loadbalancing is working by making multiple requests
+curl $(minikube ip):$NODE_PORT
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
