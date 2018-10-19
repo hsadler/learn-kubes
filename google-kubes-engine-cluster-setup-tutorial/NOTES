@@ -1,0 +1,105 @@
+
+
+/////// STEP-BY-STEP GOOGLE KUBES CLUSTER SETUP ///////
+
+
+////// GOOGLE SERVICE SETUP
+
+// 1. select the project
+
+// 2. create a cluster via the Kubernetes Engine section
+
+// 3. configure cluster creation with at least 'name' and 'zone', hit 'create'
+
+// 4. connnect to the cluster via ssh (figure out connection outside of Google's
+// service)
+
+
+////// CONNECT TO CLUSTER
+
+// 5. clone your repo in the shell, EX:
+git clone https://github.com/kubernetes/examples
+
+// 6. navigate to project, EX:
+cd examples/guestbook
+
+// 7. setup gcloud and kubectl credentials
+gcloud container clusters get-credentials <cluster-name> --zone <cluster-zone>
+// EX:
+gcloud container clusters get-credentials test-cluster-1 --zone us-central1-a
+
+
+////// MASTER DEPLOY SETUP
+
+// 8. view the controller config for the Redis Deployment, EX:
+cat redis-master-deployment.yaml
+
+// 9. create the Redis Master, EX:
+kubectl create -f redis-master-deployment.yaml
+
+// 10. verify that the Redis Master Pod is running
+kubectl get pods
+
+
+////// MASTER SERVICE SETUP
+
+// 11. view the Redis Service configuration, EX:
+cat redis-master-service.yaml
+
+// 12. create the Redis Service, EX:
+kubectl create -f redis-master-service.yaml
+
+// 13. verify that the Service has been created
+kubectl get service
+
+
+////// REDIS NODE DEPLOY SETUP
+
+// 14. view the Redis Node Deployment configuration, EX:
+cat redis-slave-deployment.yaml
+
+// 15. create the Redis Nodes
+kubectl create -f redis-slave-deployment.yaml
+
+// 16. verify that the Redis Nodes are spun-up
+kubectl get pods
+
+
+////// REDIS NODE SERVICE SETUP
+
+// 17. view the Redis Node Service configuration
+cat redis-slave-service.yaml
+
+// 18. create the Redis Node Service
+kubectl create -f redis-slave-service.yaml
+
+// 19. verify that the Redis Node Service has been created
+kubectl get service
+
+
+////// FRONTEND NODE DEPLOY SETUP
+
+// 20. view the frontend Node Deployment configuration, EX:
+cat frontend-deployment.yaml
+
+// 21. edit fronted deployment configuration to expose to public traffic, EX:
+// (change spec to type: LoadBalancer)
+vi frontend-deployment.yaml
+
+// 22. create the frontend Nodes
+kubectl create -f frontend-deployment.yaml
+
+// 23. verify that the frontend Nodes are spun-up
+kubectl get pods
+
+
+////// RESULT
+
+// 24. get the external IP
+kubectl get services --watch
+
+// 25. load the page in the browser (copy and paste the external IP)
+
+
+
+
