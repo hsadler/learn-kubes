@@ -1,0 +1,29 @@
+
+purpose is to loadtest a regular docker instance vs. kubes pod instances
+
+
+/////// COMMANDS: Kubernetes (via Minikube)
+
+// make sure Minikube is running
+minikube status
+
+// point kubectl to use Minikube
+kubectl config use-context minikube
+
+// point Docker to Minikube's Docker daemon
+eval $(minikube docker-env)
+
+// build the image
+docker build -t loadtest-compare:v1 .
+
+// spin-up the cluster
+kubectl create -f server-deployment.yaml
+kubectl create -f server-service.yaml
+
+// get the exposed IP
+kubectl get services --watch
+
+
+/////// COMMANDS: bare Docker instance
+
+//

@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: loadtest-compare
+spec:
+  selector:
+    matchLabels:
+      app: loadtest-compare
+      tier: backend
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: loadtest-compare
+        tier: backend
+    spec:
+      containers:
+      - name: loadtest-compare
+        image: loadtest-compare:v1
+        imagePullPolicy: Never
+        # look this up:
+        # resources:
+        #   requests:
+        #     cpu: 100m
+        #     memory: 100Mi
+        ports:
+        - containerPort: 80
+      restartPolicy: Always
