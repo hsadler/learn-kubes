@@ -29,7 +29,7 @@ gcloud container clusters get-credentials <cluster-name> --zone <cluster-zone>
 gcloud container clusters get-credentials test-cluster-1 --zone us-central1-a
 
 
-////// MASTER DEPLOY SETUP
+////// REDIS MASTER DEPLOY SETUP
 
 // 8. view the controller config for the Redis Deployment, EX:
 cat redis-master-deployment.yaml
@@ -41,7 +41,7 @@ kubectl create -f redis-master-deployment.yaml
 kubectl get pods
 
 
-////// MASTER SERVICE SETUP
+////// REDIS MASTER SERVICE SETUP
 
 // 11. view the Redis Service configuration, EX:
 cat redis-master-service.yaml
@@ -53,7 +53,7 @@ kubectl create -f redis-master-service.yaml
 kubectl get service
 
 
-////// REDIS NODE DEPLOY SETUP
+////// REDIS SLAVE DEPLOY SETUP
 
 // 14. view the Redis Node Deployment configuration, EX:
 cat redis-slave-deployment.yaml
@@ -65,7 +65,7 @@ kubectl create -f redis-slave-deployment.yaml
 kubectl get pods
 
 
-////// REDIS NODE SERVICE SETUP
+////// REDIS SLAVE SERVICE SETUP
 
 // 17. view the Redis Node Service configuration
 cat redis-slave-service.yaml
@@ -77,7 +77,7 @@ kubectl create -f redis-slave-service.yaml
 kubectl get service
 
 
-////// FRONTEND NODE DEPLOY SETUP
+////// FRONTEND DEPLOY SETUP
 
 // 20. view the frontend Node Deployment configuration, EX:
 cat frontend-deployment.yaml

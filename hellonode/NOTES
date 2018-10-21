@@ -39,8 +39,8 @@ docker build -t hello-node:v1 .
 minikube ssh docker images
 
 
-// create a Kube Deployment that manages a Pod
-kubectl create hello-node --image=hello-node:v1 --port=8080 \
+// run a Kube Deployment that manages a Pod (this is depricated)
+kubectl run hello-node --image=hello-node:v1 --port=8080 \
 --image-pull-policy=Never
 
 // verify the Deployment
