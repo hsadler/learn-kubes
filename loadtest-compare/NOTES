@@ -20,10 +20,35 @@ docker build -t loadtest-compare:v1 .
 kubectl create -f server-deployment.yaml
 kubectl create -f server-service.yaml
 
-// get the exposed IP
-kubectl get services --watch
+// get the exposed IP from Minikube
+minikube service loadtest-compare
+
+// scale the nodes
+kubectl scale deployments/loadtest-compare --replicas=5
+
+
+/// RESULTS FOR KUBES
+latency for request amount: 1 = 0.017906962005615236
+latency for request amount: 10 = 0.015732849990844726
+latency for request amount: 100 = 0.09561010600280762
+latency for request amount: 1000 = 0.7811801390075683
+latency for request amount: 5000 = 5.269391925003052
+
 
 
 /////// COMMANDS: bare Docker instance
 
-//
+// build the image
+docker build -t loadtest-compare:v1 .
+
+// run with Docker
+docker run -p 8080:8080 loadtest-compare:v1
+
+
+/// RESULTS FOR DOCKER
+latency for request amount: 1 = 0.024644636001586916
+latency for request amount: 10 = 0.014279843002319336
+latency for request amount: 100 = 0.11481333799743652
+Errors:  ECONNRESET
+
+
