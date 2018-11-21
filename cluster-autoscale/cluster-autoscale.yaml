@@ -1,0 +1,54 @@
+
+# SERVICE
+apiVersion: "v1"
+kind: "Service"
+metadata:
+  name: "cluster-autoscale-service"
+  namespace: "default"
+  labels:
+    app: "cluster-autoscale"
+spec:
+  ports:
+  - protocol: "TCP"
+    port: 8080
+    targetPort: 8080
+  selector:
+    app: "cluster-autoscale"
+  type: "LoadBalancer"
+  loadBalancerIP: "10.128.1.36"
+---
+# DEPLOYMENT
+apiVersion: "apps/v1"
+kind: "Deployment"
+metadata:
+  name: "cluster-autoscale"
+spec:
+  selector:
+    matchLabels:
+      app: "cluster-autoscale"
+  # replicas: 3
+  template:
+    metadata:
+      labels:
+        app: "cluster-autoscale"
+    spec:
+      containers:
+      - name: "cluster-autoscale"
+        image: "cluster-autoscale:v1"
+        ports:
+        - containerPort: 8080
+      restartPolicy: "Always"
+---
+# AUTOSCALER
+apiVersion: "autoscaling/v1"
+kind: "HorizontalPodAutoscaler"
+metadata:
+  name: "cluster-autoscale"
+spec:
+  scaleTargetRef:
+    apiVersion: "apps/v1"
+    kind: "Deployment"
+    name: "cluster-autoscale"
+  minReplicas: 1
+  maxReplicas: 5
+  targetCPUUtilizationPercentage: 5

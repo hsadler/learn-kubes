@@ -1,0 +1,65 @@
+
+
+/////// STEP-BY-STEP HOW TO SCALE A CLUSTER (LOCALLY WITH MINIKUBE) ///////
+
+
+/////// CONFIGURE KUBES AND DOCKER SETUP ///////
+
+// make sure Docker daemon is running
+docker images
+
+// start the Minikube cluster (specify docker for mac with --vm-driver flag)
+minikube start --vm-driver=hyperkit
+
+// point kubectl to interact with the 'minikube' cluster by modifying the config
+kubectl config use-context minikube
+
+// verify cluster configuration
+kubectl cluster-info
+
+// open browser dashboard
+minikube dashboard
+
+// point Docker to Minikube's Docker daemon
+eval $(minikube docker-env)
+
+
+/////// SPIN-UP THE CLUSTER ///////
+
+// create the image
+docker build -t cluster-autoscale:v1 .
+
+// spin-up the deployment and expose the service via manifest file
+kubectl apply -f cluster-autoscale.yaml
+
+// hit the service
+minikube service cluster-autoscale-service
+
+
+/////// SCALE, SCALE, SCALE ///////
+
+// setup the autoscaler
+kubectl autoscale deployment cluster-autoscale --cpu-percent=1 --min=1 --max=5
+
+// view the autoscaler ('hpa' means 'horizontal pod autoscaler')
+kubectl get hpa
+
+// run script to apply the loads
+python apply-load.py
+
+
+/////// CLEANUP ///////
+
+// delete Kubes Service and Deployment
+kubectl delete hpa cluster-autoscale;
+kubectl delete service cluster-autoscale;
+kubectl delete deployment cluster-autoscale;
+
+// remove the created Docker images
+docker rmi cluster-autoscale:v1 -f
+
+// stop the Minikube virtual machine
+minikube stop
+
+// point Docker back to local daemon
+eval $(minikube docker-env -u)
